@@ -1,0 +1,347 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design tokens, following shadcn/ui's standard naming so every generated
+ * component (Button, Dialog, Command, ...) works against them unmodified.
+ * `.dark` is toggled on <html> by the theme provider (next-themes); light
+ * values live on :root and are the default.
+ */
+:root {
+  color-scheme: light;
+
+  --background: #f9f7f4;
+  --foreground: #1c1d21;
+
+  --card: #ffffff;
+  --card-foreground: #1c1d21;
+  --popover: #ffffff;
+  --popover-foreground: #1c1d21;
+
+  --primary: #5b4fe8;
+  --primary-foreground: #ffffff;
+
+  --secondary: #f1efe9;
+  --secondary-foreground: #1c1d21;
+
+  --muted: #f1efe9;
+  --muted-foreground: #6b6a70;
+
+  --accent: #efedf9;
+  --accent-foreground: #1c1d21;
+
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+
+  --success: #1a7f4b;
+  --success-foreground: #ffffff;
+  --warning: #a15c07;
+  --warning-foreground: #ffffff;
+
+  --border: #e8e4dc;
+  --input: #e8e4dc;
+  --ring: #5b4fe8;
+
+  --radius: 0.625rem;
+
+  /*
+   * Mechanism tokens: components read these instead of --primary directly
+   * so that dark mode (see below) can give specific surfaces a genuinely
+   * different treatment — not just a different color — without light mode
+   * changing at all. Every value here reproduces exactly what the plain
+   * var(--primary)-based formula already produced before these existed.
+   */
+  --gold: var(--primary);
+  --gold-muted: var(--primary);
+  --emerald-glow: var(--primary);
+
+  --button-primary-bg: var(--primary);
+  --button-primary-fg: var(--primary-foreground);
+  --button-primary-bg-hover: color-mix(in oklab, var(--primary) 80%, transparent);
+
+  --nav-active-bg: color-mix(in oklab, var(--primary) 12%, transparent);
+  --nav-active-ring: color-mix(in oklab, var(--primary) 18%, transparent);
+  --nav-active-glow: color-mix(in oklab, var(--primary) 45%, transparent);
+
+  --ambient-glow-1: var(--primary);
+  --ambient-glow-2: var(--primary);
+  --ambient-glow-3: var(--primary);
+
+  --row-hover-border: color-mix(in oklab, var(--border) 50%, transparent);
+
+  --command-selected-bg: var(--muted);
+  --command-selected-fg: var(--foreground);
+
+  --calendar-today-ring: transparent;
+}
+
+/*
+ * Dark mode: "Executive Emerald & Gold" — a luxury-watch palette (deep
+ * forest-emerald surfaces, champagne gold as a restrained accent, warm
+ * ivory text). Gold is deliberately NOT wired to every --primary consumer:
+ * large-area fills (buttons, active-nav background) stay emerald via their
+ * own mechanism tokens below, so gold only ever shows up as text, a thin
+ * border/ring, or a soft glow — never as a big solid block.
+ */
+.dark {
+  color-scheme: dark;
+
+  --background: #071f18;
+  --foreground: #f3ecda;
+
+  --card: #0c3025;
+  --card-foreground: #f3ecda;
+  --popover: #103a2c;
+  --popover-foreground: #f3ecda;
+
+  --primary: #d4af37;
+  --primary-foreground: #0a2b20;
+
+  --secondary: #10362a;
+  --secondary-foreground: #e9e1cc;
+
+  --muted: #10362a;
+  --muted-foreground: #93a69b;
+
+  --accent: #15422f;
+  --accent-foreground: #f3ecda;
+
+  --destructive: #b2504c;
+  --destructive-foreground: #fbeae6;
+
+  --success: #4ca97b;
+  --success-foreground: #06231a;
+  --warning: #d3a155;
+  --warning-foreground: #221805;
+
+  --border: #1e4b39;
+  --input: #1e4b39;
+  --ring: #d4af37;
+
+  --gold: #d4af37;
+  --gold-muted: #a98a3e;
+  --emerald-glow: #1f5a43;
+
+  --button-primary-bg: #103a2c;
+  --button-primary-fg: #e7c878;
+  --button-primary-bg-hover: #154a37;
+
+  --nav-active-bg: color-mix(in oklab, var(--accent) 90%, transparent);
+  --nav-active-ring: color-mix(in oklab, var(--gold) 32%, transparent);
+  --nav-active-glow: color-mix(in oklab, var(--gold) 20%, transparent);
+
+  --ambient-glow-1: var(--gold);
+  --ambient-glow-2: var(--emerald-glow);
+  --ambient-glow-3: var(--emerald-glow);
+
+  --row-hover-border: color-mix(in oklab, var(--gold) 35%, transparent);
+
+  --command-selected-bg: color-mix(in oklab, var(--gold) 16%, var(--popover));
+  --command-selected-fg: var(--foreground);
+
+  --calendar-today-ring: color-mix(in oklab, var(--gold-muted) 45%, transparent);
+}
+
+@theme inline {
+  --font-sans: "Geist Variable", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-gold: var(--gold);
+  --color-gold-muted: var(--gold-muted);
+  --color-emerald-glow: var(--emerald-glow);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+}
+
+/*
+ * Glass system — three surface tiers plus a "hero" tier, all derived from
+ * the existing card/popover/foreground/primary tokens via color-mix() so
+ * they stay correct in both themes automatically and never need their own
+ * light/dark overrides. Tuned so text on top always stays easily readable;
+ * if a surface ever looks murky, its opacity/blur should go DOWN, not up.
+ *
+ *   glass-subtle  — KPI tiles, day cards: barely-there frost
+ *   glass         — sidebar, topbar, task containers: the standard panel
+ *   glass-elevated— dialogs, sheets, popovers, menus: needs to read clearly
+ *   glass-hero    — the one hero surface per page (Next Up card)
+ */
+@utility glass-subtle {
+  background-color: color-mix(in oklab, var(--card) 55%, transparent);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent);
+  box-shadow: 0 1px 2px color-mix(in oklab, var(--foreground) 4%, transparent);
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+@utility glass {
+  background-color: color-mix(in oklab, var(--card) 68%, transparent);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid color-mix(in oklab, var(--foreground) 10%, transparent);
+  box-shadow: 0 4px 20px color-mix(in oklab, var(--foreground) 6%, transparent);
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+@utility glass-elevated {
+  background-color: color-mix(in oklab, var(--popover) 88%, transparent);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent);
+  box-shadow:
+    0 16px 48px color-mix(in oklab, var(--foreground) 12%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--background) 60%, transparent) inset;
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+@utility glass-hero {
+  position: relative;
+  background-color: color-mix(in oklab, var(--card) 72%, transparent);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid color-mix(in oklab, var(--primary) 20%, transparent);
+  box-shadow:
+    0 20px 56px color-mix(in oklab, var(--foreground) 8%, transparent),
+    0 1px 0 color-mix(in oklab, var(--background) 70%, transparent) inset;
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+/* Soft accent glow sitting behind .glass-hero — pair as: <div class="relative"><div class="hero-glow" /><div class="glass-hero">...</div></div> */
+@utility hero-glow {
+  position: absolute;
+  inset: -1.5rem;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(60% 100% at 20% 0%, color-mix(in oklab, var(--primary) 22%, transparent), transparent 70%);
+  filter: blur(28px);
+  pointer-events: none;
+}
+
+@utility ambient-background {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(1100px 650px at 8% -12%, color-mix(in oklab, var(--ambient-glow-1) 10%, transparent), transparent 55%),
+    radial-gradient(750px 750px at 108% 12%, color-mix(in oklab, var(--ambient-glow-2) 7%, transparent), transparent 55%),
+    radial-gradient(900px 550px at 45% 112%, color-mix(in oklab, var(--ambient-glow-3) 5%, transparent), transparent 55%);
+  transition: background-color 200ms ease;
+}
+
+/* Destructive-tinted variant of glass-subtle, for the one overdue-tasks surface on the dashboard. */
+@utility glass-subtle-destructive {
+  background-color: color-mix(in oklab, var(--card) 55%, transparent);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid color-mix(in oklab, var(--destructive) 22%, transparent);
+  box-shadow: 0 1px 2px color-mix(in oklab, var(--destructive) 5%, transparent);
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+/* Primary-tinted variant of glass-subtle, for the one "this is today" accent on the dashboard. */
+@utility glass-subtle-accent {
+  background-color: color-mix(in oklab, var(--card) 55%, transparent);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid color-mix(in oklab, var(--primary) 30%, transparent);
+  box-shadow: 0 1px 2px color-mix(in oklab, var(--primary) 6%, transparent);
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+/* Active nav item: translucent fill + soft glow, both theme-driven so dark mode can keep the fill neutral-emerald and put gold only in the ring/glow. */
+@utility nav-active {
+  position: relative;
+  background-color: var(--nav-active-bg);
+  box-shadow:
+    inset 0 0 0 1px var(--nav-active-ring),
+    0 0 16px -6px var(--nav-active-glow);
+  transition:
+    background-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply ambient-background text-foreground;
+    position: relative;
+    min-height: 100%;
+    -webkit-font-smoothing: antialiased;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+  /* Extremely subtle grain so large glass/gradient areas don't look flat or banded. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.025;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  #root {
+    position: relative;
+    z-index: 1;
+  }
+  html {
+    @apply font-sans;
+  }
+}

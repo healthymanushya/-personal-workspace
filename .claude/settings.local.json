@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/shivamthakur/Desktop/-personal-workspace log --oneline -20)",
+      "Bash(git -C /Users/shivamthakur/Desktop/-personal-workspace status)",
+      "Bash(curl -s http://localhost:8000/api/health)",
+      "Bash(curl -s http://localhost:8000/docs -o /dev/null -w \"%{http_code}\\\\n\")",
+      "Bash(pkill -f \"uvicorn app.main:app\")",
+      "Bash(npm --version)",
+      "Bash(rmdir frontend/src/api frontend/src/components/dashboard frontend/src/components/layout frontend/src/components/tasks frontend/src/components frontend/src/context frontend/src/hooks frontend/src/pages frontend/src/styles frontend/src/types frontend/src/utils frontend/src frontend)",
+      "Bash(npm create *)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(curl -s -o /dev/null -w \"frontend: %{http_code}\\\\n\" http://localhost:5173)",
+      "Bash(curl -s -X POST http://localhost:8000/api/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"shivt1045@gmail.com\",\"password\":\"workspace123\"}' -o /dev/null -w \"login: %{http_code}\\\\n\")",
+      "Bash(python3 -c ' *)",
+      "Bash(npx shadcn@latest --version)",
+      "Bash(npx shadcn@latest init --yes --base-color neutral --force)",
+      "Bash(npx shadcn@latest init --help)",
+      "Bash(npx shadcn@latest init --template vite --yes --force)",
+      "Bash(npx shadcn@latest init --template vite --base radix --yes --force)",
+      "Bash(npx shadcn@latest init --template vite --base radix --preset nova --yes --force)",
+      "Bash(npx shadcn@latest add button card badge avatar dialog sheet dropdown-menu popover command calendar tooltip separator tabs input textarea select checkbox switch scroll-area progress skeleton sonner alert alert-dialog breadcrumb navigation-menu label --yes --overwrite)",
+      "Bash(xargs -I{} sh -c 'echo \"=== {} ===\"; cat {}')",
+      "Bash(npx tsc *)",
+      "Bash(echo \"TSC_EXIT:$?\")",
+      "Bash(node *)",
+      "Bash(grep -o \".\\\\{0,60\\\\}data-\\\\[side.\\\\{0,120\\\\}\" index-CPV0WalQ.css)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8000/docs)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
+      "Bash(python -m pytest -q)",
+      "Bash(curl *)",
+      "Bash(lsof -iTCP -sTCP:LISTEN -P)"
+    ]
+  }
+}
