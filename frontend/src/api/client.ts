@@ -53,11 +53,19 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     if (token) headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_URL}${path}${buildQuery(query)}`, {
-    method,
-    headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_URL}${path}${buildQuery(query)}`, {
+      method,
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+  } catch (err) {
+    // fetch() throws on network-level failures (offline, DNS, CORS rejection, etc.)
+    // Log the real cause for debugging; never surface it to the user.
+    console.error(`[api] network error calling ${method} ${path}:`, err);
+    throw new ApiError(0, "Unable to reach the server. Please check your connection and try again.");
+  }
 
   if (response.status === 401) {
     clearToken();
@@ -72,10 +80,20 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   }
 
   const text = await response.text();
-  const data = text ? JSON.parse(text) : null;
+  let data: unknown = null;
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      // Non-JSON body (e.g. a plain-text 5xx from the server/proxy). Log it for
+      // debugging but don't leak raw server output to the user.
+      console.error(`[api] non-JSON response from ${method} ${path} (status ${response.status}):`, text);
+    }
+  }
 
   if (!response.ok) {
-    const message = data?.detail ?? "Request failed";
+    const detail = (data as { detail?: unknown } | null)?.detail;
+    const message = detail ?? (data === null && text ? "Server error. Please try again." : "Request failed");
     throw new ApiError(response.status, typeof message === "string" ? message : JSON.stringify(message));
   }
 
