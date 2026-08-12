@@ -1,5 +1,8 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 
+from alembic import command
+from alembic.config import Config
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -8,6 +11,11 @@ from app.config import settings
 from app.database import SessionLocal
 from app.models.user import User
 from app.routers import auth, dashboard, reminders, tasks
+
+
+def run_migrations() -> None:
+    alembic_cfg = Config(str(Path(__file__).resolve().parents[1] / "alembic.ini"))
+    command.upgrade(alembic_cfg, "head")
 
 
 def seed_admin_user() -> None:
@@ -32,6 +40,7 @@ def seed_admin_user() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    run_migrations()
     seed_admin_user()
     yield
 
