@@ -10,6 +10,9 @@ import { NotificationHistoryProvider } from "./context/NotificationHistoryContex
 import { ThemeProvider } from "./components/providers/theme-provider";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { Toaster } from "./components/ui/sonner";
+import { registerServiceWorker } from "./pwa/registerServiceWorker";
+
+registerServiceWorker();
 
 const queryClient = new QueryClient({
   defaultOptions: {

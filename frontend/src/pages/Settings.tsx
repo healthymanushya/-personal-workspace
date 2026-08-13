@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useTheme } from "next-themes";
-import { LogOut, Monitor, Moon, Sun } from "lucide-react";
+import { Download, LogOut, Monitor, Moon, Sun } from "lucide-react";
 import Shell from "@/components/layout/Shell";
 import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ApiError } from "@/api/client";
 import * as authApi from "@/api/auth";
+import { usePwaInstall } from "@/pwa/usePwaInstall";
 
 function currentPermission(): NotificationPermission | "unsupported" {
   return typeof Notification === "undefined" ? "unsupported" : Notification.permission;
@@ -30,6 +31,7 @@ const THEME_OPTIONS = [
 export default function Settings() {
   const { user, logout } = useAuth();
   const { theme, setTheme } = useTheme();
+  const { canInstall, isIOS, promptInstall } = usePwaInstall();
   const [permission, setPermission] = useState(currentPermission);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -146,6 +148,27 @@ export default function Settings() {
             </div>
           </CardContent>
         </Card>
+
+        {(canInstall || isIOS) && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Install App</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {canInstall && (
+                <Button size="sm" onClick={promptInstall}>
+                  <Download /> Install App
+                </Button>
+              )}
+              {!canInstall && isIOS && (
+                <p className="text-sm text-muted-foreground">
+                  Tap <strong className="text-foreground">Share</strong>, then{" "}
+                  <strong className="text-foreground">Add to Home Screen</strong> to install Personal Workspace.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         <Card>
           <CardHeader>
