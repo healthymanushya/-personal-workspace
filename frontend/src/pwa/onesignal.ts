@@ -3,6 +3,7 @@ const ONESIGNAL_APP_ID = "264778ee-71e9-4aa2-87e9-66c8355bdea0";
 interface OneSignalSdk {
   init: (options: {
     appId: string;
+    path: string;
     serviceWorkerPath: string;
     serviceWorkerParam: { scope: string };
   }) => Promise<void>;
@@ -53,9 +54,13 @@ export function initOneSignal(): void {
   withOneSignal(async (OneSignal) => {
     await OneSignal.init({
       appId: ONESIGNAL_APP_ID,
-      // Use our existing merged service worker instead of OneSignal's
-      // default /OneSignalSDKWorker.js, so there is only ever one
-      // registration controlling scope "/".
+      // "path" is required for serviceWorkerPath/serviceWorkerParam to take
+      // effect at all -- without it, OneSignal silently ignores both and
+      // falls back to registering its own default /OneSignalSDKWorker.js
+      // (which doesn't exist here and 404s into our SPA's HTML fallback).
+      // Together these three point OneSignal at our existing merged worker
+      // instead, so there is only ever one registration controlling "/".
+      path: "/",
       serviceWorkerPath: "sw.js",
       serviceWorkerParam: { scope: "/" },
     });
