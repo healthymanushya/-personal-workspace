@@ -180,7 +180,6 @@ export default function Settings() {
                   id="new-password"
                   type="password"
                   required
-                  minLength={8}
                   autoComplete="new-password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
@@ -192,7 +191,6 @@ export default function Settings() {
                   id="confirm-new-password"
                   type="password"
                   required
-                  minLength={8}
                   autoComplete="new-password"
                   value={confirmNewPassword}
                   onChange={(e) => setConfirmNewPassword(e.target.value)}

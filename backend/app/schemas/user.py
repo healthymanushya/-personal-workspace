@@ -21,8 +21,6 @@ class ChangePasswordRequest(BaseModel):
     def passwords_match(self) -> "ChangePasswordRequest":
         if self.new_password != self.confirm_new_password:
             raise ValueError("New password and confirmation do not match")
-        if len(self.new_password) < 8:
-            raise ValueError("New password must be at least 8 characters")
         return self
 
 
