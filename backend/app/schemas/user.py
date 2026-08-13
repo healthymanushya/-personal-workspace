@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, model_validator
 
 
 class UserCreate(BaseModel):
@@ -10,6 +10,20 @@ class UserCreate(BaseModel):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+    confirm_new_password: str
+
+    @model_validator(mode="after")
+    def passwords_match(self) -> "ChangePasswordRequest":
+        if self.new_password != self.confirm_new_password:
+            raise ValueError("New password and confirmation do not match")
+        if len(self.new_password) < 8:
+            raise ValueError("New password must be at least 8 characters")
+        return self
 
 
 class UserOut(BaseModel):

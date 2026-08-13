@@ -20,3 +20,14 @@ export function register(email: string, password: string, full_name?: string): P
 export function me(): Promise<User> {
   return apiRequest<User>("/api/auth/me");
 }
+
+export function changePassword(
+  current_password: string,
+  new_password: string,
+  confirm_new_password: string,
+): Promise<User> {
+  return apiRequest<User>("/api/auth/change-password", {
+    method: "POST",
+    body: { current_password, new_password, confirm_new_password },
+  });
+}

@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useTheme } from "next-themes";
 import { LogOut, Monitor, Moon, Sun } from "lucide-react";
 import Shell from "@/components/layout/Shell";
 import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ApiError } from "@/api/client";
+import * as authApi from "@/api/auth";
 
 function currentPermission(): NotificationPermission | "unsupported" {
   return typeof Notification === "undefined" ? "unsupported" : Notification.permission;
@@ -27,6 +31,36 @@ export default function Settings() {
   const { user, logout } = useAuth();
   const { theme, setTheme } = useTheme();
   const [permission, setPermission] = useState(currentPermission);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+
+  async function handleChangePassword(e: FormEvent) {
+    e.preventDefault();
+    setPasswordError(null);
+    setPasswordSuccess(false);
+
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError("New password and confirmation do not match");
+      return;
+    }
+
+    setChangingPassword(true);
+    try {
+      await authApi.changePassword(currentPassword, newPassword, confirmNewPassword);
+      setPasswordSuccess(true);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmNewPassword("");
+    } catch (err) {
+      setPasswordError(err instanceof ApiError ? err.message : "Something went wrong");
+    } finally {
+      setChangingPassword(false);
+    }
+  }
 
   async function enableNotifications() {
     if (typeof Notification === "undefined") return;
@@ -110,6 +144,64 @@ export default function Settings() {
               <span className="text-muted-foreground">Timezone</span>
               <span className="font-medium text-foreground">Asia/Kolkata (IST)</span>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Change Password</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              {passwordError && (
+                <div role="alert" className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                  {passwordError}
+                </div>
+              )}
+              {passwordSuccess && (
+                <div role="status" className="rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600">
+                  Password updated successfully.
+                </div>
+              )}
+              <div className="space-y-1.5">
+                <Label htmlFor="current-password">Current Password</Label>
+                <Input
+                  id="current-password"
+                  type="password"
+                  required
+                  autoComplete="current-password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="new-password">New Password</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="confirm-new-password">Confirm New Password</Label>
+                <Input
+                  id="confirm-new-password"
+                  type="password"
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                />
+              </div>
+              <Button type="submit" size="sm" disabled={changingPassword}>
+                {changingPassword ? "Updating..." : "Update Password"}
+              </Button>
+            </form>
           </CardContent>
         </Card>
 
