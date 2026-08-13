@@ -6,6 +6,14 @@
 // under /api/, or any non-GET request -- so it can never cache a login
 // response, a JWT, or per-user task/dashboard data, and can never serve
 // stale data for those.
+//
+// OneSignal Web Push is merged into this same worker (rather than
+// registering a second service worker) because a browser only allows one
+// active registration per scope, and both need to control "/". OneSignal's
+// bundle only adds push / notificationclick / notificationclose /
+// pushsubscriptionchange / message / activate listeners -- verified it adds
+// no fetch listener of its own, so it cannot affect the caching rules below.
+importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 
 const CACHE_VERSION = "pw-shell-v1";
 const SHELL_URL = "/";

@@ -11,8 +11,10 @@ import { ThemeProvider } from "./components/providers/theme-provider";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { Toaster } from "./components/ui/sonner";
 import { registerServiceWorker } from "./pwa/registerServiceWorker";
+import { initOneSignal } from "./pwa/onesignal";
 
 registerServiceWorker();
+initOneSignal();
 
 const queryClient = new QueryClient({
   defaultOptions: {

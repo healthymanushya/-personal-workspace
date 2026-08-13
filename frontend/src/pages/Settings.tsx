@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { ApiError } from "@/api/client";
 import * as authApi from "@/api/auth";
 import { usePwaInstall } from "@/pwa/usePwaInstall";
+import { requestOneSignalPermission } from "@/pwa/onesignal";
 
 function currentPermission(): NotificationPermission | "unsupported" {
   return typeof Notification === "undefined" ? "unsupported" : Notification.permission;
@@ -68,6 +69,7 @@ export default function Settings() {
     if (typeof Notification === "undefined") return;
     const result = await Notification.requestPermission();
     setPermission(result);
+    requestOneSignalPermission();
   }
 
   return (
