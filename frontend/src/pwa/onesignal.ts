@@ -6,6 +6,7 @@ interface OneSignalSdk {
     path: string;
     serviceWorkerPath: string;
     serviceWorkerParam: { scope: string };
+    serviceWorkerOverrideForTypical: boolean;
   }) => Promise<void>;
   Notifications: {
     requestPermission: () => Promise<void>;
@@ -54,15 +55,19 @@ export function initOneSignal(): void {
   withOneSignal(async (OneSignal) => {
     await OneSignal.init({
       appId: ONESIGNAL_APP_ID,
-      // "path" is required for serviceWorkerPath/serviceWorkerParam to take
-      // effect at all -- without it, OneSignal silently ignores both and
-      // falls back to registering its own default /OneSignalSDKWorker.js
-      // (which doesn't exist here and 404s into our SPA's HTML fallback).
-      // Together these three point OneSignal at our existing merged worker
-      // instead, so there is only ever one registration controlling "/".
+      // For a "typical" (non-subdomain) OneSignal site integration -- which
+      // this is -- path/serviceWorkerPath/serviceWorkerParam are silently
+      // ignored in favor of the dashboard's own default worker settings
+      // unless serviceWorkerOverrideForTypical is explicitly set. Without
+      // it, OneSignal always tries to register its own default
+      // /OneSignalSDKWorker.js (which doesn't exist here and 404s into our
+      // SPA's HTML fallback). Together these four point OneSignal at our
+      // existing merged worker instead, so there is only ever one
+      // registration controlling "/".
       path: "/",
       serviceWorkerPath: "sw.js",
       serviceWorkerParam: { scope: "/" },
+      serviceWorkerOverrideForTypical: true,
     });
     // Self-heals browsers where permission was already granted before this
     // fix (or via a prior visit) without waiting for a button click.
