@@ -2,7 +2,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    database_url: str = "sqlite:///./personal_workspace.db"
+    # No default: every environment (local .env or Render's dashboard env vars)
+    # must set this explicitly, so a missing var fails startup loudly instead
+    # of silently falling back to an ephemeral, per-deploy SQLite file.
+    database_url: str
     jwt_secret: str = "dev-secret-change-me"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 10080  # 7 days
