@@ -67,9 +67,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 export function SidebarBrand() {
   return (
     <div className="flex items-center gap-2.5 px-5 py-5">
-      <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">
-        PW
-      </div>
+      <img src="/personal-workspace-logo.png" alt="" className="h-7 w-7 rounded-md" />
       <span className="text-sm font-semibold tracking-tight text-foreground">Personal Workspace</span>
     </div>
   );

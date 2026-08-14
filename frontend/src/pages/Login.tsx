@@ -33,9 +33,7 @@ export default function Login() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-lg font-semibold text-primary-foreground">
-            PW
-          </div>
+          <img src="/personal-workspace-logo.png" alt="" className="mb-4 inline-block h-11 w-11 rounded-xl" />
           <h1 className="text-xl font-semibold tracking-tight text-foreground">Personal Workspace</h1>
           <p className="mt-1 text-sm text-muted-foreground">Sign in to manage your tasks</p>
         </div>
