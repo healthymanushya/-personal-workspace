@@ -25,6 +25,8 @@ export interface Task {
   due_at_ist: string; // ISO with +05:30 offset
   reminder_minutes_before: number | null;
   reminder_fired_at: string | null;
+  due_notification_enabled: boolean;
+  due_alert_fired_at: string | null;
   snoozed_until: string | null;
   completed_at: string | null;
   created_at: string;
@@ -40,6 +42,7 @@ export interface TaskCreateInput {
   due_date: string;
   due_time?: string | null;
   reminder_minutes_before?: number | null;
+  due_notification_enabled?: boolean;
 }
 
 export type TaskUpdateInput = Partial<TaskCreateInput> & { status?: TaskStatus };
@@ -87,6 +90,7 @@ export const REMINDER_OPTIONS: { value: number | null; label: string }[] = [
   { value: 15, label: "15 minutes before" },
   { value: 30, label: "30 minutes before" },
   { value: 60, label: "1 hour before" },
+  { value: 1440, label: "1 day before" },
 ];
 
 export const SNOOZE_OPTIONS: { minutes: number; label: string }[] = [

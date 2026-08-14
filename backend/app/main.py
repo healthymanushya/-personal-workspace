@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -11,6 +12,7 @@ from app.config import settings
 from app.database import SessionLocal
 from app.models.user import User
 from app.routers import auth, dashboard, reminders, tasks
+from app.services.notification_scheduler import run_notification_scheduler
 
 
 def run_migrations() -> None:
@@ -42,7 +44,15 @@ def seed_admin_user() -> None:
 async def lifespan(app: FastAPI):
     run_migrations()
     seed_admin_user()
-    yield
+    scheduler_task = asyncio.create_task(run_notification_scheduler())
+    try:
+        yield
+    finally:
+        scheduler_task.cancel()
+        try:
+            await scheduler_task
+        except asyncio.CancelledError:
+            pass
 
 
 app = FastAPI(title="Personal Workspace API", version="0.1.0", lifespan=lifespan)

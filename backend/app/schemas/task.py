@@ -13,6 +13,7 @@ class TaskBase(BaseModel):
     due_date: date
     due_time: time | None = None
     reminder_minutes_before: int | None = Field(default=None, ge=0, le=10080)
+    due_notification_enabled: bool = True
 
 
 class TaskCreate(TaskBase):
@@ -28,6 +29,7 @@ class TaskUpdate(BaseModel):
     due_date: date | None = None
     due_time: time | None = None
     reminder_minutes_before: int | None = None
+    due_notification_enabled: bool | None = None
 
 
 class TaskSnooze(BaseModel):
@@ -57,6 +59,8 @@ class TaskOut(BaseModel):
 
     reminder_minutes_before: int | None
     reminder_fired_at: datetime | None
+    due_notification_enabled: bool
+    due_alert_fired_at: datetime | None
 
     snoozed_until: datetime | None
     completed_at: datetime | None

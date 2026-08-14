@@ -4,7 +4,7 @@ from datetime import date as date_, datetime
 from datetime import time as time_
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Date, DateTime, Enum, ForeignKey, Integer, String, Text, Time
+from sqlalchemy import Boolean, Date, DateTime, Enum, ForeignKey, Integer, String, Text, Time
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -58,6 +58,7 @@ class Task(Base):
 
     reminder_minutes_before: Mapped[int | None] = mapped_column(Integer, nullable=True)
     reminder_fired_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    due_notification_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     due_alert_fired_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     snoozed_until: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

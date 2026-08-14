@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
+import { useTaskDetail } from "./context/TaskDetailContext";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Today from "./pages/Today";
@@ -28,6 +30,27 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   return <>{children}</>;
+}
+
+// Opens the task named by a `?task=<id>` query param -- how a clicked
+// reminder push notification (OneSignal `url`) lands on a specific task.
+function NotificationDeepLink() {
+  const { user } = useAuth();
+  const { openTaskDetail } = useTaskDetail();
+
+  useEffect(() => {
+    if (!user) return;
+    const params = new URLSearchParams(window.location.search);
+    const taskId = params.get("task");
+    if (!taskId) return;
+
+    openTaskDetail(taskId);
+    params.delete("task");
+    const rest = params.toString();
+    window.history.replaceState({}, "", window.location.pathname + (rest ? `?${rest}` : ""));
+  }, [user, openTaskDetail]);
+
+  return null;
 }
 
 export default function App() {
@@ -103,6 +126,7 @@ export default function App() {
     </Routes>
     <TaskDetailModal />
     <ReminderCenter />
+    <NotificationDeepLink />
     </>
   );
 }

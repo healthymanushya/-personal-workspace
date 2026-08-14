@@ -56,6 +56,8 @@ def serialize_task(task: Task) -> TaskOut:
         due_at_ist=due_at_ist.isoformat() if due_at_ist else "",
         reminder_minutes_before=task.reminder_minutes_before,
         reminder_fired_at=task.reminder_fired_at,
+        due_notification_enabled=task.due_notification_enabled,
+        due_alert_fired_at=task.due_alert_fired_at,
         snoozed_until=task.snoozed_until,
         completed_at=task.completed_at,
         created_at=task.created_at,
@@ -106,6 +108,7 @@ def list_tasks(
 
 def create_task(db: Session, user: User, payload: TaskCreate) -> Task:
     due_at = combine_ist_to_utc_naive(payload.due_date, payload.due_time)
+    now = now_utc()
     task = Task(
         user_id=user.id,
         title=payload.title,
@@ -117,6 +120,11 @@ def create_task(db: Session, user: User, payload: TaskCreate) -> Task:
         due_time=payload.due_time,
         due_at=due_at,
         reminder_minutes_before=payload.reminder_minutes_before,
+        due_notification_enabled=payload.due_notification_enabled,
+        # A task created with a due_at already in the past must never fire a
+        # notification for it -- pre-mark both as already "fired".
+        reminder_fired_at=now if due_at <= now else None,
+        due_alert_fired_at=now if due_at <= now else None,
     )
     db.add(task)
     db.commit()
@@ -128,11 +136,21 @@ def update_task(db: Session, task: Task, payload: TaskUpdate) -> Task:
     data = payload.model_dump(exclude_unset=True)
 
     date_changed = "due_date" in data or "due_time" in data
+    # Any change to when the task is due, or to the pre-reminder offset,
+    # invalidates the current notification schedule -- clear the fired
+    # markers so the (possibly new) trigger times can fire again.
+    reschedule_relevant = date_changed or "reminder_minutes_before" in data
+
     for field, value in data.items():
         setattr(task, field, value)
 
     if date_changed:
         task.due_at = combine_ist_to_utc_naive(task.due_date, task.due_time)
+
+    if reschedule_relevant:
+        now = now_utc()
+        task.reminder_fired_at = now if task.due_at <= now else None
+        task.due_alert_fired_at = now if task.due_at <= now else None
 
     db.add(task)
     db.commit()

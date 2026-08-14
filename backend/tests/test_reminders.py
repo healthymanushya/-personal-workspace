@@ -182,6 +182,59 @@ def test_overdue_task_still_eligible_for_due_alert(client, auth_headers, db_sess
     assert any(i["kind"] == "due" and i["task"]["id"] == task["id"] for i in items)
 
 
+def test_creating_task_with_past_due_at_does_not_fire(client, auth_headers, db_session):
+    """A task must never fire notifications for a due_at already in the
+    past at creation time."""
+    past_date = str(today_ist() - timedelta(days=1))
+    resp = client.post(
+        "/api/tasks",
+        json={
+            "title": "Backdated task",
+            "category": "other",
+            "priority": "medium",
+            "due_date": past_date,
+            "due_time": "09:00:00",
+            "reminder_minutes_before": 15,
+        },
+        headers=auth_headers,
+    )
+    assert resp.status_code == 201
+    task_id = resp.json()["id"]
+
+    items = client.get("/api/reminders/due-now", headers=auth_headers).json()
+    assert items == []
+
+    t = db_session.get(Task, task_id)
+    assert t.reminder_fired_at is not None
+    assert t.due_alert_fired_at is not None
+
+
+def test_editing_due_time_resets_fired_state(client, auth_headers, db_session):
+    """A plain PATCH (not /reschedule) that changes due_date/due_time must
+    also reset the fired markers, so the new schedule can fire."""
+    task = make_task(client, auth_headers, reminder_minutes_before=15)
+    _set_due_at(db_session, task["id"], now_utc() - timedelta(seconds=5))
+    client.post(f"/api/reminders/{task['id']}/ack", json={"kind": "due"}, headers=auth_headers)
+
+    t = db_session.get(Task, task["id"])
+    assert t.due_alert_fired_at is not None
+
+    new_date = str(today_ist() + timedelta(days=2))
+    resp = client.patch(
+        f"/api/tasks/{task['id']}",
+        json={"due_date": new_date, "due_time": "10:00:00"},
+        headers=auth_headers,
+    )
+    assert resp.status_code == 200
+
+    items = client.get("/api/reminders/due-now", headers=auth_headers).json()
+    assert items == []  # far future, no window yet
+
+    _set_due_at(db_session, task["id"], now_utc() - timedelta(seconds=5))
+    items = client.get("/api/reminders/due-now", headers=auth_headers).json()
+    assert any(i["kind"] == "due" and i["task"]["id"] == task["id"] for i in items)
+
+
 def test_reminders_are_scoped_to_ist_due_at(client, auth_headers, db_session):
     """due_at is stored as naive UTC; due_at_ist must reflect the +05:30 offset."""
     task = make_task(client, auth_headers, reminder_minutes_before=15, due_time="09:00:00")

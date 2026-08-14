@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { CATEGORIES, PRIORITIES, REMINDER_OPTIONS, type Task, type TaskCreateInput } from "@/types/task";
 import { useCreateTask, useUpdateTask } from "@/hooks/useTasks";
 import { ApiError } from "@/api/client";
@@ -43,6 +44,7 @@ export default function TaskForm({
   const [reminder, setReminder] = useState(
     task?.reminder_minutes_before != null ? String(task.reminder_minutes_before) : "none",
   );
+  const [notifyAtDueTime, setNotifyAtDueTime] = useState(task?.due_notification_enabled ?? true);
 
   const [error, setError] = useState<string | null>(null);
   const submitting = createTask.isPending || updateTask.isPending;
@@ -59,6 +61,7 @@ export default function TaskForm({
       due_date: dueDate,
       due_time: dueTime ? `${dueTime}:00` : null,
       reminder_minutes_before: reminder === "none" ? null : Number(reminder),
+      due_notification_enabled: notifyAtDueTime,
     };
 
     try {
@@ -187,6 +190,13 @@ export default function TaskForm({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="flex items-center justify-between rounded-lg border border-border px-3 py-2.5">
+            <Label htmlFor="task-notify-due" className="cursor-pointer text-sm font-normal">
+              Notify me at due time
+            </Label>
+            <Switch id="task-notify-due" checked={notifyAtDueTime} onCheckedChange={setNotifyAtDueTime} />
           </div>
 
           <DialogFooter className="items-center gap-3 sm:justify-between">

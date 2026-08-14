@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import * as authApi from "../api/auth";
 import { clearToken, getToken, setToken } from "../api/client";
 import type { User } from "../types/user";
+import { loginOneSignal, logoutOneSignal } from "../pwa/onesignal";
 
 interface AuthContextValue {
   user: User | null;
@@ -24,7 +25,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     authApi
       .me()
-      .then(setUser)
+      .then((u) => {
+        setUser(u);
+        loginOneSignal(u.id);
+      })
       .catch(() => clearToken())
       .finally(() => setLoading(false));
   }, []);
@@ -33,11 +37,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const res = await authApi.login(email, password);
     setToken(res.access_token);
     setUser(res.user);
+    loginOneSignal(res.user.id);
   }
 
   function logout() {
     clearToken();
     setUser(null);
+    logoutOneSignal();
     window.location.href = "/login";
   }
 

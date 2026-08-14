@@ -16,6 +16,8 @@ interface OneSignalSdk {
       optIn: () => Promise<void>;
     };
   };
+  login: (externalId: string) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 declare global {
@@ -78,4 +80,18 @@ export function initOneSignal(): void {
 export function requestOneSignalPermission(): void {
   if (!import.meta.env.PROD) return;
   withOneSignal(syncSubscription);
+}
+
+// Links this browser's push subscription to our app's user ID (OneSignal's
+// "external_id"), so the backend can target a notification at the right
+// person via include_aliases. Does not touch init(), the service worker, or
+// the permission/subscribe flow.
+export function loginOneSignal(externalId: string): void {
+  if (!import.meta.env.PROD) return;
+  withOneSignal((OneSignal) => OneSignal.login(externalId));
+}
+
+export function logoutOneSignal(): void {
+  if (!import.meta.env.PROD) return;
+  withOneSignal((OneSignal) => OneSignal.logout());
 }
